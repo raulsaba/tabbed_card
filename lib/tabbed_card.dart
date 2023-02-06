@@ -23,12 +23,12 @@ class _TabbedCardState extends State<TabbedCard> {
   List<TabbedCardItem> get tabs => widget.tabs;
   Radius get radius => widget.radius;
 
-  int currentIndex = 0;
+  int _currentIndex = 0;
 
   Radius noRadius = const Radius.circular(0);
 
   void changeTab(int index) {
-    currentIndex = index;
+    _currentIndex = index;
     setState(() {});
   }
 
@@ -63,7 +63,7 @@ class _TabbedCardState extends State<TabbedCard> {
                 itemCount: tabs.length,
                 scrollDirection: Axis.horizontal,
                 itemBuilder: (context, index) {
-                  final bool selected = currentIndex == index;
+                  final bool selected = _currentIndex == index;
                   final TabbedCardItem tab = tabs[index];
 
                   return GestureDetector(
@@ -118,7 +118,7 @@ class _TabbedCardState extends State<TabbedCard> {
             ),
             Container(
               decoration: BoxDecoration(
-                  color: tabs[currentIndex].options?.tabColor ??
+                  color: tabs[_currentIndex].options?.tabColor ??
                       Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.only(
                     topLeft: _getTopLeftBorder(),
@@ -127,7 +127,7 @@ class _TabbedCardState extends State<TabbedCard> {
                     bottomRight: radius,
                   )),
               padding: const EdgeInsets.all(8.0),
-              child: tabs[currentIndex].child,
+              child: tabs[_currentIndex].child,
             ),
           ],
         ),
