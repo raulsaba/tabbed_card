@@ -10,6 +10,8 @@ class TabbedCard extends StatefulWidget {
     required this.tabs,
     this.contentPadding = const EdgeInsets.all(8),
     this.radius = 15,
+    this.elevation = 8,
+    this.cardColor,
   }) : assert(tabs.length > 0);
 
   ///List of tabs
@@ -18,7 +20,14 @@ class TabbedCard extends StatefulWidget {
   ///It will be a Radius Circular
   final double radius;
 
+  /// The padding o the content (child)
   final EdgeInsets contentPadding;
+
+  ///The elevation of the card
+  final double elevation;
+
+  ///The color of the Card (the tabs can be customizated with the TabbedCardItensOptions) - By default it is the ColorScheme.surface
+  final Color? cardColor;
 
   @override
   State<TabbedCard> createState() => _TabbedCardState();
@@ -28,6 +37,8 @@ class _TabbedCardState extends State<TabbedCard> {
   List<TabbedCardItem> get tabs => widget.tabs;
   double get radius => widget.radius;
   EdgeInsets get contentPadding => widget.contentPadding;
+  double get elevation => widget.elevation;
+  Color? get cardColor => widget.cardColor;
 
   int _currentIndex = 0;
 
@@ -122,7 +133,7 @@ class _TabbedCardState extends State<TabbedCard> {
   @override
   Widget build(BuildContext context) {
     return Material(
-      elevation: 8,
+      elevation: elevation,
       color: Colors.transparent,
       borderRadius: BorderRadius.all(Radius.circular(radius)),
       child: Container(
@@ -131,7 +142,8 @@ class _TabbedCardState extends State<TabbedCard> {
         ),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(radius)),
-          color: Theme.of(context).colorScheme.surface.withOpacity(0.7),
+          color: cardColor ??
+              Theme.of(context).colorScheme.surface.withOpacity(0.7),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -172,7 +184,8 @@ class _TabbedCardState extends State<TabbedCard> {
                           color: tab.options?.tabColor
                                   ?.withOpacity(selected ? 1 : 0.5) ??
                               (selected
-                                  ? Theme.of(context).colorScheme.surface
+                                  ? cardColor ??
+                                      Theme.of(context).colorScheme.surface
                                   : Colors.transparent),
                           borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(radius),
