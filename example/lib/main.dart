@@ -1,7 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:tabbed_card/tabbed_card.dart';
-import 'package:tabbed_card/tabbed_card_item.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,7 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Raul Sabadin - Tabbed Card',
+      title: 'Tabbed Card Example',
       scrollBehavior: ScrollConfiguration.of(context)
           .copyWith(scrollbars: false, dragDevices: {
         PointerDeviceKind.touch,

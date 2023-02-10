@@ -2,7 +2,7 @@ library tabbed_card;
 
 import 'package:flutter/material.dart';
 
-import 'tabbed_card_item.dart';
+part 'tabbed_card_item.dart';
 
 class TabbedCard extends StatefulWidget {
   const TabbedCard({

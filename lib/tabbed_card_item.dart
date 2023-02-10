@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+part of 'tabbed_card.dart';
 
 class TabbedCardItem {
   final String label;
