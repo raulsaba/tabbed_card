@@ -8,12 +8,17 @@ class TabbedCard extends StatefulWidget {
   const TabbedCard({
     super.key,
     required this.tabs,
-    this.radius = const Radius.circular(15),
+    this.contentPadding = const EdgeInsets.all(8),
+    this.radius = 15,
   }) : assert(tabs.length > 0);
 
+  ///List of tabs
   final List<TabbedCardItem> tabs;
 
-  final Radius radius;
+  ///It will be a Radius Circular
+  final double radius;
+
+  final EdgeInsets contentPadding;
 
   @override
   State<TabbedCard> createState() => _TabbedCardState();
@@ -21,21 +26,97 @@ class TabbedCard extends StatefulWidget {
 
 class _TabbedCardState extends State<TabbedCard> {
   List<TabbedCardItem> get tabs => widget.tabs;
-  Radius get radius => widget.radius;
+  double get radius => widget.radius;
+  EdgeInsets get contentPadding => widget.contentPadding;
 
   int _currentIndex = 0;
 
   Radius noRadius = const Radius.circular(0);
 
-  void changeTab(int index) {
+  late Radius topLeft;
+  late Radius topRight;
+
+  void changeTab(int index, GlobalKey key) {
     _currentIndex = index;
+    _selectedTabKey = key;
+    _updateBorders();
     setState(() {});
   }
 
-  final ScrollController _tabsScrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
 
-  Radius _getTopLeftBorder() {
-    return radius;
+  @override
+  void initState() {
+    topLeft = noRadius;
+    topRight = Radius.circular(radius);
+    super.initState();
+    _scrollController.addListener(() {
+      _updateBorders();
+      setState(() {});
+    });
+    Future.delayed(const Duration(milliseconds: 300)).then((value) {
+      _updateTabsParams();
+    });
+  }
+
+  _updateBorders() {
+    if (_selectedTabKey != null) {
+      _updateTabsParams();
+      final Offset selectedOffset = _getGlobalKeyOffset(_selectedTabKey!);
+      final Size selectedSize = _getGlobalKeySize(_selectedTabKey!);
+      _updateTopLeftRadius(selectedOffset);
+      _updateTopRightRadius(selectedOffset, selectedSize);
+    }
+  }
+
+  _updateTabsParams() {
+    final RenderBox renderBox =
+        _tabsKey.currentContext?.findRenderObject() as RenderBox;
+    tabsOffset = renderBox.localToGlobal(Offset.zero);
+    tabsSize = renderBox.size;
+  }
+
+  _updateTopLeftRadius(Offset selectedOffset) {
+    if (selectedOffset.dx <= tabsOffset.dx) {
+      topLeft = noRadius;
+    } else if (selectedOffset.dx >= tabsOffset.dx + radius) {
+      topLeft = Radius.circular(radius);
+    } else {
+      topLeft = Radius.circular(selectedOffset.dx - tabsOffset.dx);
+    }
+  }
+
+  _updateTopRightRadius(Offset selectedOffset, Size selectedSize) {
+    final double selectedRightPosition = selectedOffset.dx + selectedSize.width;
+    final double tabsRightPosition = tabsOffset.dx + tabsSize.width;
+    if (selectedOffset.dx > tabsRightPosition) {
+      topRight = Radius.circular(radius);
+    } else if (selectedRightPosition >= tabsRightPosition) {
+      topRight = noRadius;
+    } else if (selectedRightPosition < tabsRightPosition - radius) {
+      topRight = Radius.circular(radius);
+    } else {
+      topRight = Radius.circular(tabsRightPosition - selectedRightPosition);
+    }
+  }
+
+  final GlobalKey _tabsKey = GlobalKey();
+  late Offset tabsOffset;
+  late Size tabsSize;
+  GlobalKey? _selectedTabKey;
+
+  Offset _getGlobalKeyOffset(GlobalKey key) {
+    final RenderBox renderBox =
+        key.currentContext?.findRenderObject() as RenderBox;
+
+    return renderBox.localToGlobal(Offset.zero);
+  }
+
+  Size _getGlobalKeySize(GlobalKey key) {
+    final RenderBox renderBox =
+        key.currentContext?.findRenderObject() as RenderBox;
+
+    return renderBox.size;
   }
 
   @override
@@ -43,13 +124,13 @@ class _TabbedCardState extends State<TabbedCard> {
     return Material(
       elevation: 8,
       color: Colors.transparent,
-      borderRadius: BorderRadius.all(radius),
+      borderRadius: BorderRadius.all(Radius.circular(radius)),
       child: Container(
         constraints: const BoxConstraints(
           maxHeight: double.infinity,
         ),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(radius),
+          borderRadius: BorderRadius.all(Radius.circular(radius)),
           color: Theme.of(context).colorScheme.surface.withOpacity(0.7),
         ),
         child: Column(
@@ -58,17 +139,24 @@ class _TabbedCardState extends State<TabbedCard> {
             SizedBox(
               width: double.infinity,
               height: 40,
+              key: _tabsKey,
               child: ListView.builder(
-                controller: _tabsScrollController,
+                controller: _scrollController,
                 itemCount: tabs.length,
                 scrollDirection: Axis.horizontal,
                 itemBuilder: (context, index) {
                   final bool selected = _currentIndex == index;
                   final TabbedCardItem tab = tabs[index];
 
+                  final GlobalKey tabKey = GlobalKey();
+
+                  if (selected) {
+                    _selectedTabKey = tabKey;
+                  }
+
                   return GestureDetector(
                     onTap: () {
-                      changeTab(index);
+                      changeTab(index, tabKey);
                     },
                     child: MouseRegion(
                       cursor: selected
@@ -76,6 +164,7 @@ class _TabbedCardState extends State<TabbedCard> {
                           : SystemMouseCursors.click,
                       child: Container(
                         height: 40,
+                        key: tabKey,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 15,
                         ),
@@ -86,8 +175,8 @@ class _TabbedCardState extends State<TabbedCard> {
                                   ? Theme.of(context).colorScheme.surface
                                   : Colors.transparent),
                           borderRadius: BorderRadius.only(
-                            topLeft: radius,
-                            topRight: radius,
+                            topLeft: Radius.circular(radius),
+                            topRight: Radius.circular(radius),
                           ),
                         ),
                         child: Builder(builder: (context) {
@@ -121,12 +210,12 @@ class _TabbedCardState extends State<TabbedCard> {
                   color: tabs[_currentIndex].options?.tabColor ??
                       Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.only(
-                    topLeft: _getTopLeftBorder(),
-                    topRight: radius,
-                    bottomLeft: radius,
-                    bottomRight: radius,
+                    topLeft: topLeft,
+                    topRight: topRight,
+                    bottomLeft: Radius.circular(radius),
+                    bottomRight: Radius.circular(radius),
                   )),
-              padding: const EdgeInsets.all(8.0),
+              padding: contentPadding,
               child: tabs[_currentIndex].child,
             ),
           ],

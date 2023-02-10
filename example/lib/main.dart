@@ -13,19 +13,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Raul Sabadin - Custom Widgets',
+      title: 'Raul Sabadin - Tabbed Card',
       scrollBehavior: ScrollConfiguration.of(context)
           .copyWith(scrollbars: false, dragDevices: {
         PointerDeviceKind.touch,
         PointerDeviceKind.mouse,
       }),
-      theme: ThemeData(
-        primarySwatch: Colors.purple,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.purple,
-        ),
-      ),
-      home: const MyHomePage(title: 'My Custom Widgets'),
+      home: const MyHomePage(title: 'Tabbed Card'),
     );
   }
 }
@@ -84,6 +78,19 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               options: TabbedCardItensOptions(
                   tabColor: Colors.black,
+                  labelStyle: const TextStyle(color: Colors.white)),
+              child: const Placeholder(
+                color: Colors.purple,
+              ),
+            ),
+            TabbedCardItem(
+              label: 'Another with an icon and custom LabelStyle',
+              icon: const Icon(
+                Icons.dashboard,
+                color: Colors.white,
+              ),
+              options: TabbedCardItensOptions(
+                  tabColor: Colors.red,
                   labelStyle: const TextStyle(color: Colors.white)),
               child: const Placeholder(
                 color: Colors.purple,
