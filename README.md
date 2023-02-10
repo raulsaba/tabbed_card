@@ -2,6 +2,8 @@
 
 It is a custom card with Tabs for keeps multiple contents
 
+![](https://media0.giphy.com/media/LhuU64zK4N6vfdZcy3/giphy.gif)
+
 ## Getting Started
 
 Add the dependency in `pubspec.yaml`:
