@@ -81,8 +81,10 @@ class _TabbedCardState extends State<TabbedCard> {
   }
 
   _updateTabsParams() {
-    final RenderBox renderBox =
-        _tabsKey.currentContext?.findRenderObject() as RenderBox;
+    if (_tabsKey.currentContext == null) {
+      return;
+    }
+    final RenderBox renderBox = _tabsKey.currentContext?.findRenderObject() as RenderBox;
     tabsOffset = renderBox.localToGlobal(Offset.zero);
     tabsSize = renderBox.size;
   }
@@ -117,15 +119,19 @@ class _TabbedCardState extends State<TabbedCard> {
   GlobalKey? _selectedTabKey;
 
   Offset _getGlobalKeyOffset(GlobalKey key) {
-    final RenderBox renderBox =
-        key.currentContext?.findRenderObject() as RenderBox;
+    if (key.currentContext == null) {
+      return Offset.zero;
+    }
+    final RenderBox renderBox = key.currentContext?.findRenderObject() as RenderBox;
 
     return renderBox.localToGlobal(Offset.zero);
   }
 
   Size _getGlobalKeySize(GlobalKey key) {
-    final RenderBox renderBox =
-        key.currentContext?.findRenderObject() as RenderBox;
+    if (key.currentContext == null) {
+      return Size.zero;
+    }
+    final RenderBox renderBox = key.currentContext?.findRenderObject() as RenderBox;
 
     return renderBox.size;
   }
@@ -142,8 +148,7 @@ class _TabbedCardState extends State<TabbedCard> {
         ),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(radius)),
-          color: cardColor ??
-              Theme.of(context).colorScheme.surface.withOpacity(0.7),
+          color: cardColor ?? Theme.of(context).colorScheme.surface.withOpacity(0.7),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -171,9 +176,7 @@ class _TabbedCardState extends State<TabbedCard> {
                       changeTab(index, tabKey);
                     },
                     child: MouseRegion(
-                      cursor: selected
-                          ? SystemMouseCursors.basic
-                          : SystemMouseCursors.click,
+                      cursor: selected ? SystemMouseCursors.basic : SystemMouseCursors.click,
                       child: Container(
                         height: 40,
                         key: tabKey,
@@ -181,12 +184,8 @@ class _TabbedCardState extends State<TabbedCard> {
                           horizontal: 15,
                         ),
                         decoration: BoxDecoration(
-                          color: tab.options?.tabColor
-                                  ?.withOpacity(selected ? 1 : 0.5) ??
-                              (selected
-                                  ? cardColor ??
-                                      Theme.of(context).colorScheme.surface
-                                  : Colors.transparent),
+                          color: tab.options?.tabColor?.withOpacity(selected ? 1 : 0.5) ??
+                              (selected ? cardColor ?? Theme.of(context).colorScheme.surface : Colors.transparent),
                           borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(radius),
                             topRight: Radius.circular(radius),
@@ -220,8 +219,7 @@ class _TabbedCardState extends State<TabbedCard> {
             ),
             Container(
               decoration: BoxDecoration(
-                  color: tabs[_currentIndex].options?.tabColor ??
-                      Theme.of(context).colorScheme.surface,
+                  color: tabs[_currentIndex].options?.tabColor ?? Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.only(
                     topLeft: topLeft,
                     topRight: topRight,
